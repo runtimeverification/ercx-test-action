@@ -14,7 +14,7 @@ async function run() {
       {ignoreReturnCode: true}
     );
 
-    const expected = await fs.readFile('/test/', 'utf8');
+    const expected = await fs.readFile('test/golden/ERC20MockTest.t.sol.out', 'utf8');
 
     if (expected !== output.stdout) {
       core.setFailed("foundry output did not match expected output.");
