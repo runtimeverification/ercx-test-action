@@ -4129,7 +4129,7 @@ async function run() {
         }
       }
     };
-    await exec.exec('forge', ['test', '--siltent', '--match-contract', 'ERC20MockTest'], options);
+    await exec.exec('forge', ['test', '--silent', '--match-contract', 'ERC20MockTest'], options);
 
     const expected = await fs.readFile('/test/', 'utf8');
 
