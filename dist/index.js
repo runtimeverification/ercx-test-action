@@ -2688,19 +2688,10 @@ exports.default = _default;
 
 /***/ }),
 
-/***/ 258:
+/***/ 290:
 /***/ ((module) => {
 
-let wait = function (milliseconds) {
-  return new Promise((resolve) => {
-    if (typeof milliseconds !== 'number') {
-      throw new Error('milliseconds not a number');
-    }
-    setTimeout(() => resolve("done!"), milliseconds)
-  });
-};
-
-module.exports = wait;
+module.exports = eval("require")("@actions/exec");
 
 
 /***/ }),
@@ -2835,20 +2826,34 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 const core = __nccwpck_require__(186);
-const wait = __nccwpck_require__(258);
+const exec = __nccwpck_require__(290);
+const { promises: fs } = __nccwpck_require__(747);
 
 
 // most @actions toolkit packages have async methods
 async function run() {
   try {
-    const ms = core.getInput('milliseconds');
-    core.info(`Waiting ${ms} milliseconds ...`);
+    core.info('Running golden tests');
+    let output = '';
+    let error = '';
+    const options = {
+      listeners : {
+        stdout: (data) => {
+          output += data.toString();
+        },
+        stderr: (data) => {
+          error += data.toString();
+        }
+      }
+    };
+    await exec.exec('forge', ['test', '--siltent', '--match-contract', 'ERC20MockTest'], options);
 
-    core.debug((new Date()).toTimeString()); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-    await wait(parseInt(ms));
-    core.info((new Date()).toTimeString());
+    const expected = await fs.readFile('/test/', 'utf8');
 
-    core.setOutput('time', new Date().toTimeString());
+    if (expected !== output) {
+      core.setFailed("foundry output did not match expected output.");
+    }
+
   } catch (error) {
     core.setFailed(error.message);
   }

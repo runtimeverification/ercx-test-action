@@ -11,10 +11,10 @@ async function run() {
     let error = '';
     const options = {
       listeners : {
-        stdout: (data: Buffer) => {
+        stdout: (data) => {
           output += data.toString();
         },
-        stderr: (data: Buffer) => {
+        stderr: (data) => {
           error += data.toString();
         }
       }
