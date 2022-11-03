@@ -1,18 +1,32 @@
 const core = require('@actions/core');
-const wait = require('./wait');
+const exec = require('@actions/exec');
+const { promises: fs } = require('fs');
 
 
 // most @actions toolkit packages have async methods
 async function run() {
   try {
-    const ms = core.getInput('milliseconds');
-    core.info(`Waiting ${ms} milliseconds ...`);
+    core.info('Running golden tests');
+    let output = '';
+    let error = '';
+    const options = {
+      listeners : {
+        stdout: (data: Buffer) => {
+          output += data.toString();
+        },
+        stderr: (data: Buffer) => {
+          error += data.toString();
+        }
+      }
+    };
+    await exec.exec('forge', ['test', '--siltent', '--match-contract', 'ERC20MockTest'], options);
 
-    core.debug((new Date()).toTimeString()); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-    await wait(parseInt(ms));
-    core.info((new Date()).toTimeString());
+    const expected = await fs.readFile('/test/', 'utf8');
 
-    core.setOutput('time', new Date().toTimeString());
+    if (expected !== output) {
+      core.setFailed("foundry output did not match expected output.");
+    }
+
   } catch (error) {
     core.setFailed(error.message);
   }
