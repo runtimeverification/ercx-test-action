@@ -4159,7 +4159,7 @@ function compare(actual, expected) {
   let result = true;
   for (let line of expectedLines) {
     const testResult = parseLine(line);
-    if (testResults.get(testResult.signature) !== testResult.result) {
+    if (testResults.get(testResult.signature).includes("PASS") !== testResult.result.includes("PASS")) {
       core.error(`The test result for ${testResult.signature} does not match the expected value.`);
       result = false;
     }
