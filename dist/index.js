@@ -4140,7 +4140,7 @@ function compare(actual, expected) {
   let actualLines = actual.split("\n");
   let expectedLines = expected.split("\n");
   if (actualLines.length !== expectedLines.length) {
-    core.warn("The number of test cases in the expected output and actual output mismatch");
+    core.error("The number of test cases in the expected output and actual output mismatch");
     return false;
   }
   // Remove the first and last line from the output. These lines
@@ -4160,7 +4160,7 @@ function compare(actual, expected) {
   for (let line of expectedLines) {
     const testResult = parseLine(line);
     if (testResults.get(testResult.signature) !== testResult.result) {
-      core.warn(`The test result for ${testResult.signature} does not match the expected value.`);
+      core.error(`The test result for ${testResult.signature} does not match the expected value.`);
       result = false;
     }
   }
