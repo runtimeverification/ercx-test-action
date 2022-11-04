@@ -12,7 +12,7 @@ async function run() {
       'forge',
       ['test', '--list', '--json', '--silent']
     );
-    const tests = JSON.parse(forgeListOut.trim());
+    const tests = JSON.parse(forgeListOut.stdout);
     const testFiles = Object.keys(tests);
 
     let result = true;
