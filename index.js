@@ -7,6 +7,7 @@ const { promises: fs } = require('fs');
 async function run() {
   try {
     core.info('Running golden tests');
+    const infura_api_key = core.getInput('infura_api_key');
     
     const forgeListOut = await exec.getExecOutput(
       'forge',
@@ -20,7 +21,12 @@ async function run() {
       // Run forge test
       const forgeTestOut = await exec.getExecOutput(
         'forge',
-        ['test', '--silent', '--match-path', testFile],
+        [
+          'test',
+          '--silent',
+          '--match-path', testFile,
+          '--fork-url', `https://mainnet.infura.io/v3/${infura_api_key}`
+        ],
         {ignoreReturnCode: true}
       );
       const actual = forgeTestOut.stdout;
