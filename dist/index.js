@@ -4140,6 +4140,7 @@ function compare(actual, expected) {
   let actualLines = actual.split("\n");
   let expectedLines = expected.split("\n");
   if (actualLines.length !== expectedLines.length) {
+    core.warn("The number of test cases in the expected output and actual output mismatch");
     return false;
   }
   // Remove the first and last line from the output. These lines
@@ -4154,15 +4155,16 @@ function compare(actual, expected) {
     testResults.set(testResult.signature, testResult.result);
   }
   // Go over each test case of the expected foundry ouput and check
-  // if it matches the actual output. If not, we shortcut and return
-  // false
+  // if it matches the actual output.
+  let result = true;
   for (let line of expectedLines) {
     const testResult = parseLine(line);
     if (testResults.get(testResult.signature) !== testResult.result) {
-      return false;
+      core.warn(`The test result for ${testResult.signature} does not match the expected value.`);
+      result = false;
     }
   }
-  return true;
+  return result;
 }
 
 function parseLine(line) {
