@@ -4118,19 +4118,37 @@ async function run() {
   try {
     core.info('Running golden tests');
     
-    const output = await exec.getExecOutput(
+    const forgeListOut = await exec.getExecOutput(
       'forge',
-      ['test', '--silent', '--match-contract', 'ERC20MockTest'],
-      {ignoreReturnCode: true}
+      ['test', '--list', '--json', '--silent']
     );
-    
-    const actual = output.stdout;
-    const expected = await fs.readFile('test/golden/ERC20MockTest.t.sol.out', 'utf8');
+    const tests = JSON.parse(forgeListOut);
+    const testFiles = Object.keys(tests);
 
-    if (!compare(actual, expected)) {
-      core.setFailed("foundry output did not match expected output.");
+    let result = true;
+    for (let testFile of testFiles) {
+      // Run forge test
+      const forgeTestOut = await exec.getExecOutput(
+        'forge',
+        ['test', '--silent', '--match-path', testFile],
+        {ignoreReturnCode: true}
+      );
+      const actual = forgeTestOut.stdout;
+      // Read expected ouput from golden file
+      const goldenFile = testFile.replace(/^test/, 'test/golden') + '.out';
+      try {
+        const expected = await fs.readFile(goldenFile, 'utf8');
+        // Compare expected output to actual output
+        if (!compare(actual, expected)) {
+          result = false;
+        }
+      } catch (e) {
+        core.warning(`Couldn't find a golden file for test file: ${testFile}`);
+      }
     }
-
+    if (!result) {
+      core.setFailed("One or more golden tests failed");
+    }
   } catch (error) {
     core.setFailed(error.message);
   }
