@@ -14,7 +14,9 @@ async function run() {
       ['test', '--list', '--json', '--silent']
     );
     const tests = JSON.parse(forgeListOut.stdout);
-    const testFiles = Object.keys(tests);
+    const testFiles = Object.keys(tests).filter(testFile => 
+      testFile.match(/^test\/golden/)
+    );
 
     let result = true;
     for (let testFile of testFiles) {
@@ -31,7 +33,7 @@ async function run() {
       );
       const actual = forgeTestOut.stdout;
       // Read expected ouput from golden file
-      const goldenFile = testFile.replace(/^test/, 'test/golden') + '.out';
+      const goldenFile = testFile + '.out';
       try {
         const expected = await fs.readFile(goldenFile, 'utf8');
         // Compare expected output to actual output
