@@ -4118,6 +4118,7 @@ async function run() {
   try {
     core.info('Running golden tests');
     const infura_api_key = core.getInput('infura_api_key');
+    const etherscan_api_key = core.getInput('etherscan_api_key');
     
     const forgeListOut = await exec.getExecOutput(
       'forge',
@@ -4139,7 +4140,12 @@ async function run() {
           '--match-path', testFile,
           '--fork-url', `https://mainnet.infura.io/v3/${infura_api_key}`
         ],
-        {ignoreReturnCode: true}
+        {
+          ignoreReturnCode: true,
+          env : {
+            ETHERSCAN_API_KEY : etherscan_api_key
+          }
+        }
       );
       const actual = forgeTestOut.stdout;
       // Read expected ouput from golden file
