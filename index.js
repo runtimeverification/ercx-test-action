@@ -26,6 +26,7 @@ async function run() {
         'forge',
         [
           'test',
+          '--ffi',
           '--silent',
           '--match-path', testFile,
           '--fork-url', `https://mainnet.infura.io/v3/${infura_api_key}`
