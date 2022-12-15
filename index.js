@@ -44,8 +44,13 @@ async function run() {
       try {
         const expected = await fs.readFile(goldenFile, 'utf8');
         // Compare expected output to actual output
-        if (!compare(actual, expected)) {
-          result = false;
+        try {
+          if (!compare(actual, expected)) {
+            result = false;
+          }
+        } catch (error) {
+          core.error(`Couldn't compare expected output.`);
+          core.setFailed(error.message);
         }
       } catch (e) {
         core.warning(`Couldn't find a golden file for test file: ${testFile}`);
